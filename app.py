@@ -35,7 +35,7 @@ st.title('🚀 Customer Churn Prediction & Revenue Platform')
 st.write("""
 This dashboard predicts the likelihood of a customer churning based on their 
 account details and behavioral features. It uses an XGBoost model with an 
-**AUC of 0.86+** and a **Recall-optimized threshold**.
+**AUC of 0.84+** and a **Recall-optimized threshold**.
 """)
 
 # --- Create input fields in the sidebar ---
