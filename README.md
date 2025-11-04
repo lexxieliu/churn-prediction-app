@@ -25,7 +25,7 @@ This project predicts customer churn for a telecom company. The primary goal is 
 <img width="770" height="752" alt="Screenshot 2025-11-03 at 6 34 03 PM" src="https://github.com/user-attachments/assets/a198eea5-3ecd-48ac-987b-66815abbfdcb" />
 
 ## Key Features
-* **ML Model:** An XGBoost classifier trained on 7,000+ customer records (AUC: 0.86).
+* **ML Model:** An XGBoost classifier trained on 7,000+ customer records (AUC: 0.84).
 * **Feature Engineering:** Includes RFM analysis and behavioral features (like `fiber_no_support` and `contract_risk_score`).
 * **Business Impact:** The model uses a recall-optimized threshold (0.30) to achieve a **7.9x ROI** on retention efforts.
 * **Deployment:** The app is containerized and deployed on Streamlit Community Cloud.
