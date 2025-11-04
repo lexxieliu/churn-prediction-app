@@ -216,11 +216,9 @@ df['price_per_service'] = df['MonthlyCharges'] / (df['service_count'] + 1)
 # 2. AVERAGE MONTHLY SPEND RATE
 df['avg_monthly_spend'] = df['TotalCharges'] / (df['tenure'] + 1)
 
-# 3. CHARGES VS MEDIAN (Relative pricing)
-median_monthly = df['MonthlyCharges'].median()
-df['charges_vs_median'] = df['MonthlyCharges'] / median_monthly
+# *** NOTE: We will calculate 'charges_vs_median' AFTER the train-test split ***
 
-# 4. SPENDING TIER
+# 4. SPENDING TIER (This is OK, bins are fixed and not data-dependent)
 df['spending_tier'] = pd.cut(df['MonthlyCharges'],
                              bins=[0, 35, 70, 150],
                              labels=['Low', 'Medium', 'High'])
@@ -229,17 +227,7 @@ df['spending_tier'] = pd.cut(df['MonthlyCharges'],
 df['tenure_to_charges_ratio'] = df['tenure'] / (df['MonthlyCharges'] + 1)
 
 # 6. VALUE PERCEPTION SCORE
-df['value_score'] = df['service_count'] / (df['charges_vs_median'] + 0.1)
-
-print("\nRATIO FEATURES - Statistics:")
-ratio_features = ['price_per_service', 'avg_monthly_spend', 'charges_vs_median', 'value_score']
-for feat in ratio_features:
-    churned_mean = df[df['Churn']=='Yes'][feat].mean()
-    retained_mean = df[df['Churn']=='No'][feat].mean()
-    print(f"\n{feat}:")
-    print(f"  Churned: {churned_mean:.2f}")
-    print(f"  Retained: {retained_mean:.2f}")
-    print(f"  Difference: {abs(churned_mean - retained_mean):.2f}")
+# *** We will calculate 'value_score' AFTER the split, as it depends on 'charges_vs_median' ***
 
 
 # --- 1. Define Target (y) ---
@@ -250,31 +238,74 @@ target = 'Churn'
 # --- 2. Define Features (X) ---
 
 # Drop original/intermediate columns to use our final engineered features
+# We will drop 'value_score' for now as it will be created post-split
 cols_to_drop = [
     'customerID', 'Churn', 
     'tenure', 'TotalCharges', 'Contract', 'PaymentMethod', # Replaced by risk scores/recency
     'OnlineSecurity', 'OnlineBackup', 'DeviceProtection', 'TechSupport', # Used in 'support_services_count' & 'no_protection'
     'StreamingTV', 'StreamingMovies', 'PhoneService', 'MultipleLines', # Used in 'engagement_score' & 'is_streamer'
     'Partner', 'Dependents', 'PaperlessBilling', # Used in 'has_family' & 'paperless_billing_risk'
-    'rfm_score', 'service_count', # Intermediate scores, we use the components
+    'rfm_score', # Intermediate scores, we use the components
+    # *** 'service_count' REMOVED FROM THIS LIST ***
     'avg_monthly_spend', 'tenure_to_charges_ratio', 'service_diversity_ratio' # Redundant or less predictive
 ]
 
 X = df_model.drop(columns=cols_to_drop)
 y = df_model[target]
 
-# Define categorical and numerical feature lists for the pipeline
-categorical_features = X.select_dtypes(include=['object', 'category']).columns.tolist()
-numerical_features = X.select_dtypes(include=np.number).columns.tolist()
-
 # --- 3. Train-Test Split ---
-# We use 'stratify=y' to ensure the test set has the same churn proportion as the full dataset
+# *** SPLIT HAPPENS HERE, BEFORE LEAKY FEATURES ARE MADE ***
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, 
     test_size=0.2, 
     random_state=42, 
     stratify=y
 )
+
+# --- 4. POST-SPLIT FEATURE ENGINEERING (Fixing Leakage) ---
+
+# 3. CHARGES VS MEDIAN (Relative pricing)
+# Calculate median from TRAINING data only
+median_monthly = X_train['MonthlyCharges'].median()
+
+# Apply to both train and test sets
+X_train['charges_vs_median'] = X_train['MonthlyCharges'] / median_monthly
+X_test['charges_vs_median'] = X_test['MonthlyCharges'] / median_monthly
+
+# 6. VALUE PERCEPTION SCORE
+# Now we can create this feature using the non-leaky 'charges_vs_median'
+# This line will now work, as 'service_count' is in X_train
+X_train['value_score'] = X_train['service_count'] / (X_train['charges_vs_median'] + 0.1)
+X_test['value_score'] = X_test['service_count'] / (X_test['charges_vs_median'] + 0.1)
+
+
+print("\nRATIO FEATURES - Statistics (from Training Data):")
+ratio_features = ['price_per_service', 'charges_vs_median', 'value_score']
+# Need to combine X_train and y_train for this analysis
+train_df_for_stats = X_train.assign(Churn=y_train)
+for feat in ratio_features:
+    churned_mean = train_df_for_stats[train_df_for_stats['Churn']==1][feat].mean()
+    retained_mean = train_df_for_stats[train_df_for_stats['Churn']==0][feat].mean()
+    print(f"\n{feat}:")
+    print(f"  Churned: {churned_mean:.2f}")
+    print(f"  Retained: {retained_mean:.2f}")
+    print(f"  Difference: {abs(churned_mean - retained_mean):.2f}")
+
+
+# --- 5. Define Feature Lists for Pipeline ---
+# Define categorical and numerical feature lists AFTER all features are created
+categorical_features = X_train.select_dtypes(include=['object', 'category']).columns.tolist()
+numerical_features = X_train.select_dtypes(include=np.number).columns.tolist()
+
+# The 'MonthlyCharges' column is now redundant since we have engineered
+# features from it (like 'charges_vs_median' and 'spending_tier').
+# Let's remove it to avoid multicollinearity.
+if 'MonthlyCharges' in numerical_features:
+    numerical_features.remove('MonthlyCharges')
+
+# Also remove 'service_count' as it's an intermediate feature and no longer needed
+if 'service_count' in numerical_features:
+    numerical_features.remove('service_count')
 
 print(f"Training set shape: {X_train.shape}")
 print(f"Test set shape: {X_test.shape}")
