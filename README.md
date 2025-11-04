@@ -2,7 +2,7 @@
 
 A live, interactive web app that predicts customer churn risk in real-time using an XGBoost model.
 
-**[LIVE DEMO LINK](http://your-app-name.streamlit.app)
+**[LIVE DEMO LINK]([http://your-app-name.streamlit.app](https://lexxie-churn-prediction-app.streamlit.app/))
 
 ## Project Goal
 
