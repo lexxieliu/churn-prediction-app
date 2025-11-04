@@ -57,7 +57,7 @@ recency_score = col1.slider('Customer Tenure (Recency)', 1, 4, 3,
 MonthlyCharges = col2.slider('Monthly Charges ($)', 18.0, 120.0, 75.0, 0.01)
 support_services_count = col2.slider('Support Services (0-4)', 0, 4, 0, help="OnlineSecurity, Backup, DeviceProtection, TechSupport")
 engagement_score = col2.slider('Engagement Score (0-8)', 0, 8, 3)
-has_family = col2.selectbox('Has Family?', [0, 1], format_func=lambda x: {1: 'Yes (Lower Risk)', 0: 'No'}[x])
+has_family = col2.selectbox('Has Family?', [0, 1], format_func=lambda x: {1: 'Yes', 0: 'No'}[x])
 has_bundle = col2.selectbox('Phone + Internet Bundle?', [0, 1], format_func=lambda x: {1: 'Yes (Lower Risk)', 0: 'No'}[x])
 
 # Advanced options in expander
