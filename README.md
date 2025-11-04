@@ -4,6 +4,10 @@ A live, interactive web app that predicts customer churn risk in real-time using
 
 **[LIVE DEMO LINK](https://lexxie-churn-prediction-app.streamlit.app/)**
 
+## Dashboard App page
+<img width="1315" height="798" alt="Screenshot 2025-11-04 at 11 49 03 AM" src="https://github.com/user-attachments/assets/ab2a5305-61b2-49f4-afeb-84d3b36b4460" />
+<img width="1312" height="795" alt="Screenshot 2025-11-04 at 11 50 13 AM" src="https://github.com/user-attachments/assets/8e1cd578-889f-403c-a0b4-ead83eac0ed9" />
+
 ## Project Goal
 
 This project predicts customer churn for a telecom company. The primary goal is to identify high-risk customers so the business can provide targeted retention offers, saving over $500k in projected annual revenue.
@@ -19,10 +23,6 @@ This project predicts customer churn for a telecom company. The primary goal is 
 <img width="1028" height="589" alt="Screenshot 2025-11-03 at 6 33 16 PM" src="https://github.com/user-attachments/assets/b3e93f3d-8634-4094-8c9a-1d692e92b57f" />
 <img width="834" height="760" alt="Screenshot 2025-11-03 at 6 33 49 PM" src="https://github.com/user-attachments/assets/67701407-03cd-4ebd-aef4-39559400fb1f" />
 <img width="770" height="752" alt="Screenshot 2025-11-03 at 6 34 03 PM" src="https://github.com/user-attachments/assets/a198eea5-3ecd-48ac-987b-66815abbfdcb" />
-
-## Dashboard App page
-<img width="1470" height="802" alt="Screenshot 2025-11-03 at 5 32 12 PM" src="https://github.com/user-attachments/assets/02b172e6-7acc-4e6a-b6aa-6ad7b766885e" />
-<img width="1470" height="798" alt="Screenshot 2025-11-03 at 5 33 21 PM" src="https://github.com/user-attachments/assets/d37356ac-5031-461b-b714-d0e42f0d2a8c" />
 
 ## Key Features
 * **ML Model:** An XGBoost classifier trained on 7,000+ customer records (AUC: 0.86).
